@@ -1,0 +1,17 @@
+name: Feature proposal
+description: Propose a deterministic prose capability
+title: "[Proposal] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Determinism and provenance boundary
+    validations:
+      required: true

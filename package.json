@@ -1,0 +1,78 @@
+{
+  "name": "@haneoka/altair-plugin-prose",
+  "version": "0.1.0",
+  "description": "Self-contained deterministic prose adaptation plugin for Altair",
+  "keywords": [
+    "visual-novel",
+    "prose",
+    "story-editor",
+    "altair"
+  ],
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haneoka-gakuen/altair-plugin-prose.git"
+  },
+  "homepage": "https://github.com/haneoka-gakuen/altair-plugin-prose#readme",
+  "bugs": {
+    "url": "https://github.com/haneoka-gakuen/altair-plugin-prose/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE.md",
+    "README.md",
+    "SECURITY.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "verify:package": "node scripts/verify-package.mjs",
+    "check": "pnpm run typecheck && pnpm run build && pnpm run verify:package",
+    "prepack": "pnpm run check"
+  },
+  "peerDependencies": {
+    "@haneoka/altair": "^0.1.0"
+  },
+  "devDependencies": {
+    "@haneoka/altair": "^0.1.0",
+    "typescript": "^6.0.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "packageManager": "pnpm@11.14.0",
+  "altair": {
+    "pluginApi": 2,
+    "kind": "ai",
+    "capabilities": [
+      "ai"
+    ],
+    "permissions": [],
+    "targets": [
+      "web",
+      "pwa",
+      "electron",
+      "tauri",
+      "android",
+      "ios"
+    ]
+  }
+}
