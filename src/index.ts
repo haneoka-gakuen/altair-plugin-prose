@@ -1,12 +1,6 @@
 import type { AltairAiProvider } from "@haneoka/altair/protocol";
-import {
-  defineAltairPlugin,
-  type AltairPluginV2,
-} from "@haneoka/altair/plugins";
-import {
-  adaptProseDeterministically,
-  type AltairDeterministicProseOptions,
-} from "./deterministic-prose.js";
+import { defineAltairPlugin, type AltairPluginV2 } from "@haneoka/altair/plugins";
+import { adaptProseDeterministically, type AltairDeterministicProseOptions } from "./deterministic-prose.js";
 
 export {
   adaptProseDeterministically,
@@ -15,8 +9,7 @@ export {
 } from "./deterministic-prose.js";
 export type { AltairDeterministicProseOptions } from "./deterministic-prose.js";
 
-export const ALTAIR_DETERMINISTIC_PROSE_PROVIDER_ID =
-  "altair.deterministic";
+export const ALTAIR_DETERMINISTIC_PROSE_PROVIDER_ID = "altair.deterministic";
 
 export const createAltairDeterministicProseProvider = (
   options: AltairDeterministicProseOptions = {},
@@ -30,26 +23,19 @@ export const createAltairDeterministicProseProvider = (
     id: ALTAIR_DETERMINISTIC_PROSE_PROVIDER_ID,
     name: "Altair Deterministic Prose",
     async adapt(request, signal) {
-      return adaptProseDeterministically(
-        request,
-        deterministicOptions,
-        signal,
-      );
+      return adaptProseDeterministically(request, deterministicOptions, signal);
     },
   } satisfies AltairAiProvider);
 };
 
-const pluginWithProvider = (
-  provider: AltairAiProvider,
-): AltairPluginV2 =>
+const pluginWithProvider = (provider: AltairAiProvider): AltairPluginV2 =>
   defineAltairPlugin({
     manifest: {
       id: "haneoka.altair-prose",
       name: "Altair Prose",
       version: "0.1.0",
       apiVersion: 2,
-      description:
-        "Deterministic, review-required prose adaptation for Altair",
+      description: "Deterministic, review-required prose adaptation for Altair",
       capabilities: ["ai"],
     },
     setup(context) {
@@ -57,16 +43,11 @@ const pluginWithProvider = (
     },
   });
 
-export const createAltairProsePlugin = (
-  options: AltairDeterministicProseOptions = {},
-): AltairPluginV2 =>
+export const createAltairProsePlugin = (options: AltairDeterministicProseOptions = {}): AltairPluginV2 =>
   pluginWithProvider(createAltairDeterministicProseProvider(options));
 
-export const altairDeterministicProseProvider =
-  createAltairDeterministicProseProvider();
+export const altairDeterministicProseProvider = createAltairDeterministicProseProvider();
 
-export const altairProsePlugin = pluginWithProvider(
-  altairDeterministicProseProvider,
-);
+export const altairProsePlugin = pluginWithProvider(altairDeterministicProseProvider);
 
 export default altairProsePlugin;

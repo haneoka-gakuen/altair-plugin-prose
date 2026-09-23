@@ -1,8 +1,4 @@
-import type {
-  AltairAdaptationRequest,
-  AltairAdaptationResult,
-  AltairAiProvenance,
-} from "@haneoka/altair/protocol";
+import type { AltairAdaptationRequest, AltairAdaptationResult, AltairAiProvenance } from "@haneoka/altair/protocol";
 import {
   cloneStoryValue,
   createEmptyStoryProject,
@@ -12,8 +8,7 @@ import {
   type StoryProjectCommand,
 } from "@haneoka/altair/model";
 
-type StoryDiagnostic =
-  AltairAdaptationResult["diagnostics"][number];
+type StoryDiagnostic = AltairAdaptationResult["diagnostics"][number];
 
 /**
  * Deterministic implementation options owned by the prose plugin.
@@ -54,14 +49,8 @@ const FINGERPRINT_ABORT_INTERVAL = 4_096;
 
 const abortError = (signal: AbortSignal): Error => {
   if (signal.reason instanceof Error) return signal.reason;
-  const message =
-    signal.reason === undefined
-      ? "Altair prose adaptation was aborted"
-      : String(signal.reason);
-  const error =
-    typeof DOMException === "function"
-      ? new DOMException(message, "AbortError")
-      : new Error(message);
+  const message = signal.reason === undefined ? "Altair prose adaptation was aborted" : String(signal.reason);
+  const error = typeof DOMException === "function" ? new DOMException(message, "AbortError") : new Error(message);
   if (error.name !== "AbortError") {
     Object.defineProperty(error, "name", {
       configurable: true,
@@ -78,10 +67,7 @@ const throwIfAborted = (signal?: AbortSignal): void => {
 /**
  * Deterministic UTF-8 source identity used by imported IDs and provenance.
  */
-export const altairProseSourceFingerprint = (
-  source: string,
-  signal?: AbortSignal,
-): string => {
+export const altairProseSourceFingerprint = (source: string, signal?: AbortSignal): string => {
   if (typeof source !== "string") {
     throw new TypeError("Altair prose source must be a string");
   }
@@ -117,18 +103,10 @@ const proseBlockToCommand = (
   id: string,
   diagnostics: StoryDiagnostic[],
 ): StoryProjectCommand => {
-  const speakerMatch = block.match(
-    /^([^:\n：]{1,48})[：:]\s*([\s\S]+)$/,
-  );
-  const quotedMatch = block.match(
-    /^([^「『“"]{0,48})[「『“"]([\s\S]*?)[」』”"]$/,
-  );
+  const speakerMatch = block.match(/^([^:\n：]{1,48})[：:]\s*([\s\S]+)$/);
+  const quotedMatch = block.match(/^([^「『“"]{0,48})[「『“"]([\s\S]*?)[」』”"]$/);
   const speaker = (speakerMatch?.[1] || quotedMatch?.[1] || "").trim();
-  const text = (
-    speakerMatch?.[2] ||
-    quotedMatch?.[2] ||
-    block
-  ).trim();
+  const text = (speakerMatch?.[2] || quotedMatch?.[2] || block).trim();
   if (!speakerMatch && !quotedMatch) {
     diagnostics.push(
       storyDiagnostic(
@@ -176,53 +154,36 @@ export const adaptProseDeterministically = (
     ? cloneStoryValue(request.existingProject)
     : createEmptyStoryProject({
         title: request.title || "Untitled adaptation",
-        ...(request.locale === undefined
-          ? {}
-          : { locale: request.locale }),
+        ...(request.locale === undefined ? {} : { locale: request.locale }),
       });
   requireAdaptableProject(project);
 
-  const scene =
-    project.scenes.find(({ id }) => id === project.entrySceneId) ??
-    project.scenes[0];
+  const scene = project.scenes.find(({ id }) => id === project.entrySceneId) ?? project.scenes[0];
   if (!scene) throw new Error("Altair project has no scene");
   if (!Array.isArray(scene.commands)) {
     throw new TypeError("Altair project scene commands must be an array");
   }
 
   const diagnostics: StoryDiagnostic[] = [];
-  const sourceHash = altairProseSourceFingerprint(
-    request.source,
-    signal,
-  );
+  const sourceHash = altairProseSourceFingerprint(request.source, signal);
   const blocks = request.source
     .replace(/\r\n?/gu, "\n")
     .split(/\n{2,}/u)
     .map((value) => value.trim())
     .filter(Boolean);
   const occupiedIds = new Set(
-    project.scenes.flatMap((item) =>
-      Array.isArray(item.commands)
-        ? item.commands.map((command) => command.id)
-        : [],
-    ),
+    project.scenes.flatMap((item) => (Array.isArray(item.commands) ? item.commands.map((command) => command.id) : [])),
   );
   const commands: StoryProjectCommand[] = [];
   for (const [index, block] of blocks.entries()) {
     throwIfAborted(signal);
-    const baseId = importedStoryId(
-      "prose",
-      sourceHash.slice("fnv1a64:".length),
-      index,
-    );
+    const baseId = importedStoryId("prose", sourceHash.slice("fnv1a64:".length), index);
     let id = baseId;
     for (let suffix = 2; occupiedIds.has(id); suffix += 1) {
       id = `${baseId}-${suffix}`;
     }
     occupiedIds.add(id);
-    commands.push(
-      proseBlockToCommand(block, index, id, diagnostics),
-    );
+    commands.push(proseBlockToCommand(block, index, id, diagnostics));
   }
   throwIfAborted(signal);
   scene.commands.push(...commands);
@@ -237,9 +198,7 @@ export const adaptProseDeterministically = (
   };
   project.meta.provenance = {
     ...(project.meta.provenance ?? {}),
-    altairAdaptation: cloneStoryValue(
-      provenance,
-    ) as unknown as JsonObject,
+    altairAdaptation: cloneStoryValue(provenance) as unknown as JsonObject,
   };
   diagnostics.push(
     storyDiagnostic(
